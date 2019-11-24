@@ -7,29 +7,15 @@ const state = {
         {
             firstName:'Xikmatilla',
             lastName:'Maxmudov',
-            email: [{id: 0, value: 'Xikmatilla@mail.com', label: 'Home'}],
-            phone:  [{id: 0, value: '+995845421', label: 'Other'}],
+            email: [{id: 0, value: 'Xikmatilla@mail.com', label: 'Home'},{id: 1, value: 'Xikmatilla@mail.com', label: 'Home'}, ],
+            phone:  [{id: 0, value: '+998997204575', label: 'Other'}],
             address:  [{id: 0, value: 'Toshkent', label: 'Home'}]
         },
         {
-            firstName:'Xikmatilla',
-            lastName:'Maxmudov',
-            email: [{id: 0, value: 'Xikmatilla@mail.com', label: 'Home'}],
-            phone:  [{id: 0, value: '+995845421', label: 'Other'}],
-            address:  [{id: 0, value: 'Toshkent', label: 'Home'}]
-        },
-        {
-            firstName:'Xikmatilla',
-            lastName:'Maxmudov',
-            email: [{id: 0, value: 'Xikmatilla@mail.com', label: 'Home'}],
-            phone:  [{id: 0, value: '+995845421', label: 'Other'}],
-            address:  [{id: 0, value: 'Toshkent', label: 'Home'}]
-        },
-        {
-            firstName:'Xikmatilla',
-            lastName:'Maxmudov',
-            email: [{id: 0, value: 'Xikmatilla@mail.com', label: 'Home'}],
-            phone:  [{id: 0, value: '+995845421', label: 'Other'}],
+            firstName:'Shaxzodbek',
+            lastName:'Xasanov',
+            email: [{id: 0, value: 'Shaxzodbek@mail.com', label: 'Home'}],
+            phone:  [{id: 0, value: '+9958454216589', label: 'Other'}],
             address:  [{id: 0, value: 'Toshkent', label: 'Home'}]
         },
 
@@ -55,12 +41,49 @@ const actions = {
         commit('PushtoStore', resPush);
     },
 
+    async EditeLocalStore({commit},payloads) {
+        // debugger
+        const  res=  await ContactService.editeService(payloads.index, payloads.payload);
+        commit('EditetoStore', res);
+    },
+
+    async DeleteLocalStore({commit}, index) {
+        // debugger
+        const  res =  await ContactService.deleteService(index);
+        commit('DeletetoStore', res);
+    },
+
+    async SeachLocalStore({commit}, payload) {
+        // debugger
+        const  res =  await ContactService.searchService(payload);
+        commit('SeachtoStore', res);
+    },
+
 
 }
 const mutations = {
 
+
+    SeachtoStore(state, res){
+        // debugger
+        state.table = res;
+    },
+
+
+
+    DeletetoStore(state, res){
+        // debugger
+        state.table = res;
+    },
+
+
+    EditetoStore(state, res){
+        // debugger
+        state.table = res;
+    },
+
     PushtoStore(state, PushStatus){
-        debugger
+        // debugger
         state.table = PushStatus;
     },
 

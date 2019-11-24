@@ -1,17 +1,16 @@
 <template>
-    <div>
+    <div style="background-color: black">
 
         <el-menu
                 :default-active="activeIndex2"
                 class="el-menu-demo"
                 mode="horizontal"
                 @select="handleSelectNavabar"
-                background-color="#545c64"
+                style="background-color: black"
                 text-color="#fff"
-                active-text-color="#ffd04b">
-            <el-menu-item index="1"><i class="el-icon-s-fold"></i>
-            </el-menu-item>
-            <el-menu-item index="2"><a  target="_blank">Orders</a></el-menu-item>
+                active-text-color="#ffda55">
+
+            <el-menu-item index="2"><a  target="_blank">Home</a></el-menu-item>
             <el-autocomplete
                     popper-class="my-autocomplete"
                     v-model="state"
@@ -32,19 +31,17 @@
         </el-menu>
 
 
-        <el-dialog title="See" :visible.sync="modalopen" custom-class="dialog_self" center>
-            <table>
+        <el-dialog :title="titleNAme" :visible.sync="modalopen" custom-class="dialog_self" center>
+            <table style="margin-left: 30%">
                 <tr>
-                    <td>{{payloads.firstName}}</td>
-                    <td>{{payloads.lastName}}</td>
                     <ul v-for="phone in payloads.phone">
-                        <li>{{phone.value}}  -  {{phone.label }} </li>
+                        <li>Phone:&nbsp; {{phone.value}}  -  {{phone.label }} </li>
                     </ul>
                     <ul v-for="email in payloads.email">
-                        <li> {{email.value}}  -  {{email.label  }}</li>
+                        <li>Email:&nbsp; {{email.value}}  -  {{email.label  }}</li>
                     </ul>
                     <ul v-for="adres in payloads.address">
-                        <li>{{adres.value}}  -  {{adres.label }} </li>
+                        <li>Adress:&nbsp;{{adres.value}}  -  {{adres.label }} </li>
                     </ul>
                 </tr>
             </table>
@@ -62,6 +59,7 @@
 
         data() {
             return {
+                titleNAme:'',
                 modalopen:false,
                 payloads:{
                     firstName:'',
@@ -99,6 +97,7 @@
 
             handleSelect(item) {
                 console.log(item);
+                this.titleNAme = item.lastName + " " + item.firstName;
                 this.payloads = item;
                 this.modalopen = true;
 
@@ -120,6 +119,10 @@
 
 <style  lang="scss" scoped>
 
+
+    .el-menu-demo el-menu--horizontal el-menu{
+        background-color: black;
+    }
 
     .el-input {
 
@@ -143,10 +146,12 @@
     }
     .link {
         font-size: 12px;
-        color: #b4b4b4;
+        color: black;
     }
     }
     }
+
+
 
 
 </style>

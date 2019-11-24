@@ -1,7 +1,20 @@
 <template>
     <div class="hello">
         <el-row class="tac">
-            <el-button size="mini" class="right" @click="onCreateCategory" type="success">+ ДОБАВИТЬ</el-button>
+            <div class="demo-input-suffix">
+                <el-input style="width: 30%; margin-left: 30%; margin-top: 10px"
+                        placeholder="Type something"
+                        v-model="search">
+                    <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                </el-input>
+
+                <el-button size="mini"
+
+                           style="margin-left: 90%;"
+                           class="el-icon-circle-plus" @click="onCreateContact" type="success"></el-button>
+
+            </div>
+
 
             <el-dialog title="Добавить" :visible.sync="createDialog" custom-class="dialog_self" center>
 
@@ -14,6 +27,11 @@
 
                                       size="mini" placeholder="lastName"/>
                         </el-col>
+                        <div v-show="textTtrue" class="valdatsiya">
+                        <span >{{Valedatsiya}}</span></div>
+
+                        <div v-show="textTtrue2" class="valdatsiya2">
+                            <span >{{Valedatsiya2}}</span></div>
                     </el-form-item>
                     <el-form-item :label-width="formLabelWidth"
                                   v-for="(input, k) in addresses" :key="k">
@@ -48,7 +66,9 @@
                             <el-col>
 
                                 <el-input v-model="phone.value"
-                                          size="mini" placeholder="Phone"/>
+
+                                          placeholder="+998 (__) ___-__-__"
+                                          size="mini" />
                             </el-col>
 
 
@@ -58,7 +78,6 @@
                                            style="margin-left: 25px"
                                 >
                                     <el-option
-
                                             v-for="item in CityOptions"
                                             :key="item.value"
                                             :label="item.label"
@@ -122,8 +141,17 @@
 
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-    <el-button @click="createDialog = false">Cancel</el-button>
-    <el-button type="primary" @click="addForm()">Confirm</el-button>
+    <el-button @click="createDialog = false"
+               type="warning"
+               icon="el-icon-upload el-icon-right" circle>
+
+
+        </el-button>
+                <el-button type="success" icon="el-icon-check"
+                           @click="addForm()"
+                           circle></el-button>
+
+
   </span>
 
             </el-dialog>
@@ -134,7 +162,7 @@
             <el-table
                     lang="ru"
 
-                    :data="tableData.filter(data=> !search || data.firstName.toLowerCase().includes(search.toLowerCase()))"
+                    :data="tableData"
                     style="width: 100%">
                 <el-table-column
 
@@ -148,35 +176,28 @@
                         prop="lastName">
                 </el-table-column>
 
-                <el-table-column><template slot="header" slot-scope="scope">
-                <input
-                        class="el-input"
-                            style="width: 70%; margin-left: 30%; outline: none; border-radius: 5px;"
-                            v-model="search"
-                            lang="ru"
-                            placeholder="  search"/>
-
-                </template>
-                </el-table-column>
 
                 <el-table-column
                         align="right">
                     <template slot-scope="scope">
 
                         <el-button
-                                size="mini" type="primary" icon="el-icon-edit"
-                                @click="handleSee(scope.$index, scope.row)">See
+                                type="info"
+                                icon="el-icon-info el-icon-right" circle
+                                @click="handleSee(scope.$index, scope.row)">
                         </el-button>
 
 
                         <el-button
-                                size="mini"
-                                @click="handleEdit(scope.$index, scope.row)">Edit
+                                type="primary" icon="el-icon-edit" circle
+
+                                @click="handleEdit(scope.$index, scope.row)">
                         </el-button>
                         <el-button
-                                size="mini"
-                                type="danger"
-                                @click="handleDelete(scope.$index, scope.row)">Delete
+                                type="danger" icon="el-icon-delete" circle
+
+                                @click="handleDelete(scope.$index, scope.row)"
+                        >
                         </el-button>
                     </template>
                 </el-table-column>
@@ -185,19 +206,17 @@
 
 
 
-        <el-dialog title="See" :visible.sync="modalopen" custom-class="dialog_self" center>
-            <table>
+        <el-dialog :title="titleNAme" :visible.sync="modalopen" custom-class="dialog_self" center>
+            <table style="margin-left: 30%">
                 <tr>
-                    <td>{{payloads.firstName}}</td>
-                    <td>{{payloads.lastName}}</td>
                     <ul v-for="phone in payloads.phone">
-                        <li>{{phone.value}}  -  {{phone.label }} </li>
+                        <li>Phone:&nbsp; {{phone.value}}  -  {{phone.label }} </li>
                     </ul>
                     <ul v-for="email in payloads.email">
-                        <li> {{email.value}}  -  {{email.label  }}</li>
+                        <li>Email: &nbsp;{{email.value}}  -  {{email.label  }}</li>
                     </ul>
                     <ul v-for="adres in payloads.address">
-                        <li>{{adres.value}}  -  {{adres.label }} </li>
+                        <li>Adress: &nbsp; {{adres.value}}  -  {{adres.label }} </li>
                     </ul>
 
                 </tr>
@@ -212,16 +231,38 @@
 
 
 
+        <el-dialog
+                title="Delete"
+                :visible.sync="deleteDialog"
+                width="35%"
+                center>
+               <el-button type="primary" style="margin-left: 10%" @click="deleteDialog = false">No <i class="el-icon-upload el-icon-right"></i></el-button>
+
+
+            <el-button style="margin-left: 40%" type="primary" @click="deletePost()">Yes <i class="el-icon-delete el-icon-right"></i></el-button>
+
+
+        </el-dialog>
+
     </div>
 </template>
 
 <script>
     import {mapActions, mapState} from "vuex";
+    import ElSlPanel from "element-ui/packages/color-picker/src/components/sv-panel";
     export default {
+        components: {ElSlPanel},
         data() {
             return {
+
+                titleNAme:'',
+                Valedatsiya:'',
+                Valedatsiya2:'',
+                textTtrue: false,
+                textTtrue2:false,
+                deleteDialog:false,
                 modalopen:false,
-                labels: ['Home', 'Work', 'Other'],
+                IdKey:null,
                 payloads:{
                     firstName:'',
                     lastName:'',
@@ -273,18 +314,51 @@
         },
         methods: {
             ...mapActions('ContactModule', [
-                'PushLocalStore', 'PushCreate'
+                'PushLocalStore', 'PushCreate', 'EditeLocalStore', 'DeleteLocalStore', 'SeachLocalStore'
             ]),
 
+
             handleEdit(index, row) {
+                this.payloads.firstName = row.firstName;
+                // debugger
+                this.payloads.lastName = row.lastName;
+                this.addresses = row.address;
+                this.phones = row.phone;
+                this.emails = row.email;
+                this.IdKey = index;
+                this.createDialog = true;
 
                 console.log(index, row);
             },
+
             handleDelete(index, row) {
+                this.IdKey = index;
                 console.log(index, row);
+                this.deleteDialog = true;
+
+
             },
+
+
+
+            deletePost(){
+                this.DeleteLocalStore(this.IdKey);
+                setTimeout(()=>{
+                    // debugger
+                    this.tableData = this.table;
+                    this.IdKey = null;
+                    this.deleteDialog = false;
+
+                },200);
+
+            },
+
+
+
+
             handleSee(index, row) {
-              debugger
+              // debugger
+                this.titleNAme = row.lastName + " " + row.firstName;
                 console.log(index, row);
               this.payloads = row;
                 this.modalopen = true;
@@ -292,13 +366,30 @@
             },
 
 
-            onCreateCategory() {
-                (this.createDialog = true), (this.Category = {});
+            onCreateContact() {
+                this.createDialog = true;
+                this.payloads.firstName = '';
+                this.payloads.lastName= '';
+                this.payloads.email= '';
+                this.payloads.phone= '';
+                this.payloads.address= '';
+                this.newAddressId = 0;
+                this.newPhoneId = 0;
+                this.newEmailId =0;
+                this.addresses= [{id: 0, value: '', label: ''}];
+                this.phones = [{id: 0, value: '', label: ''}];
+                this.emails = [{id: 0, value: '', label: ''}];
+                this.IdKey =    null;
+                this.textTtrue = false;
+                this.textTtrue2 = false;
+
+
+
+
             },
 
 
             addAddres(index) {
-
                 this.addresses.push({
                     id: ++this.newAddressId,
                     value: '',
@@ -340,17 +431,37 @@
                 this.emails.splice(index, 1);
             },
 
-            addForm(){
-                this.createDialog = false;
+            async  addForm(){
+                if (this.IdKey === null){
+
                 this.payloads.address= this.addresses;
                 this.payloads.phone = this.phones;
                 this.payloads.email = this.emails;
                 console.log(this.payloads);
-                debugger
+                // debugger
                 this.PushLocalStore(this.payloads);
-                this.PushCreate();
+                this.createDialog = false;
 
-            }
+                }else {
+                    this.payloads.address= this.addresses;
+                    this.payloads.phone = this.phones;
+                    this.payloads.email = this.emails;
+                    // debugger
+                    console.log(this.payloads);
+                    this.createDialog = false;
+                    // debugger
+                    this.EditeLocalStore({index: this.IdKey, payload: this.payloads});
+                }
+
+
+                setTimeout(()=>{
+                    // debugger
+                    this.tableData = this.$store.state.ContactModule.table;
+                },200);
+
+
+            },
+
 
 
         },
@@ -361,6 +472,48 @@
 
         created() {
             this.PushCreate();
+        },
+
+        watch: {
+            'payloads.lastName': {
+                handler(newValue) {
+                   if (newValue === ''){
+                       // debugger
+                       this.textTtrue2 = true;
+                       this.Valedatsiya2 = 'Familiya kiritish majburiy'
+                   }else {
+                       this.textTtrue2 = false;
+                       this.Valedatsiya2 = ''
+                   }
+                }
+            },
+
+
+            'payloads.firstName': {
+                handler(newValue) {
+                    if (newValue === ''){
+                        // debugger
+                        this.textTtrue = true;
+                        this.Valedatsiya = 'Ism kiritish majburiy'
+                    }else {
+                        this.textTtrue = false;
+                        this.Valedatsiya = ''
+                    }
+                }
+            },
+
+            "search": {
+                handler(newValue) {
+
+                        this.SeachLocalStore(newValue);
+                        setTimeout(()=>{
+                            // debugger
+                            this.tableData = this.table;
+                        },200);
+                    }
+                }
+
+
         }
 
     }
@@ -368,7 +521,19 @@
 
 <style lang="scss" scoped>
 
+  .valdatsiya{
+      color: red;
+      position: absolute;
+      margin-top: 6%;
 
+  }
+  .valdatsiya2{
+      color: red;
+      position: absolute;
+      margin-top: 6%;
+      margin-left: 55%;
+
+  }
 
 
     .el-select>.el-input {
@@ -400,5 +565,96 @@
         width: 100px;
 
     }
+
+  @media (max-width: 550px) {
+
+      .valdatsiya{
+          color: red;
+          position: absolute;
+          margin-top: 30%;
+          margin-left: -80%;
+
+      }
+      .valdatsiya2{
+          display: none;
+      }
+
+  }
+
+
+  @media (max-width: 1215px) {
+
+      .valdatsiya{
+          color: red;
+          position: absolute;
+          margin-top: 9%;
+          margin-left: 20%;
+
+      }
+      .valdatsiya2{
+          display: none;
+      }
+
+
+
+  }
+
+  @media (max-width: 871px) {
+
+      .valdatsiya{
+          color: red;
+          position: absolute;
+          margin-top: 12%;
+          margin-left: 15%;
+
+      }
+      .valdatsiya2{
+          display: none;
+      }
+
+
+
+  }
+
+
+  @media (max-width: 693px) {
+
+      .valdatsiya {
+          color: red;
+          position: absolute;
+          margin-top: 20%;
+          margin-left: 5%;
+
+      }
+      .valdatsiya2 {
+          display: none;
+      }
+  }
+
+  @media (max-width: 553px) {
+
+      .valdatsiya {
+          color: red;
+          position: absolute;
+          margin-top: 30%;
+          margin-left: 5%;
+
+      }
+      .valdatsiya2 {
+          display: none;
+      }
+  }
+
+  @media (max-width: 450px) {
+
+      .valdatsiya {
+          display: none;
+      }
+      .valdatsiya2 {
+          display: none;
+      }
+  }
+
+
 
 </style>
